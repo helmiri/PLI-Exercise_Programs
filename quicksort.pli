@@ -1,0 +1,42 @@
+ quickSort : PROC OPTIONS( MAIN );
+    DCL array (20) FIXED  BIN INIT (4, -1, 10, 33, 2, -10, 0, 12, 88, 
+                        38, 22, -7, 93, -19, 45, 21, -34, 18, 55, 71);
+    
+    CALL sort(array, 1, 20);
+    DCL i FIXED BIN;
+    DO i = 1 to 20;
+        PUT LIST(array (i));
+    END;
+
+ partition: PROC (array, first, last) RETURNS( FIXED BIN );
+
+    DCL array(*) FIXED BIN;
+    DCL first, last, pivot FIXED BIN;
+
+    DCL temp, j FIXED BIN;
+    pivot = first;
+    DO j = first TO last;
+        IF array (j) <= array(pivot) THEN DO;
+            temp = array (pivot);
+            array (pivot) = array (j);
+            array (j) = temp ;
+        END;
+    END;
+    temp = array (pivot);
+    array (pivot) = array (first);
+    array (first) = temp;
+    RETURN (pivot); 
+ END;
+
+ sort : PROCEDURE (array, first, last) RECURSIVE;
+    DCL array(*) FIXED BIN;
+    DCL first, last, pivot FIXED BIN;
+
+    IF first < last THEN DO;
+        pivot = partition(array, first, last);
+        call sort(array, first, pivot - 1);
+        call sort(array, pivot + 1, last);
+    END;
+    
+ END sort;
+ END quickSort ;
