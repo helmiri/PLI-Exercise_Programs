@@ -1,0 +1,40 @@
+ /* Simple brute-force pattern matching program 
+    Usage: ./pattern_match <path_to_text_file>
+    Prints [ROW, COLUMN] where the match was found
+
+    TODO: Implement the Boyer-Moore algorithm instead
+*/
+ pattern_match: PROC(arg) OPTIONS( MAIN );
+ DCL arg VARYING CHAR(100) ;
+ DCL eof BIT(1) INIT( '0'b );
+ DCL buffer VARYING CHAR(255);
+
+ /* The pattern to look for */
+ DCL target VARYING CHAR(32) INIT (""); 
+ 
+ ON ENDFILE(input) eof='1'b;
+ OPEN FILE(input) TITLE( arg );
+
+ DCL i, j, m FIXED BIN;
+ m = 1;
+ DO WHILE (^eof);
+    READ FILE(input) INTO(buffer);
+    DO i = 1 TO LENGTH(buffer);
+      IF SUBSTR( target, 1, 1 ) = substr(buffer, i, 1) THEN DO ;
+        DO WHILE((substr(target,j + 1,1) 
+                  = substr(buffer, j + i, 1)) & j <= length(target));
+            j = j + 1;
+          END;
+          IF j = LENGTH( target ) THEN DO ; 
+            PUT SKIP LIST( "Target: " || target, "Found at: "|| m, i-1);
+            CLOSE FILE(input);
+            RETURN ; 
+          END; 
+        END; 
+    END;
+    m = m + 1;
+ END;
+ PUT SKIP LIST( "Target not found");
+ CLOSE FILE(input);
+ END pattern_match;
+
